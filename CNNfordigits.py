@@ -86,9 +86,9 @@ def random_mini_batches(X, Y, mini_batch_size = 64, seed = 0):
     for k in range(0, num_complete_minibatches):
         mini_batch_X = shuffled_X[k * mini_batch_size: (k + 1) * mini_batch_size, :, :, :]
         mini_batch_Y = shuffled_Y[k * mini_batch_size: (k + 1) * mini_batch_size, :]
-        #每一个小batch都由打乱的X，Y拼成
+        #每一个小batch都由打乱的X，Y拼成一个tuple
         mini_batch = (mini_batch_X, mini_batch_Y)
-        #组合所有的小batch
+        #组合所有的小batch，最后的mini_batches是列表嵌套元祖嵌套列表
         mini_batches.append(mini_batch)
        
      #如果总的样本数不能被mini_batch的个数整除，将剩余的样本也补充进来
@@ -160,7 +160,7 @@ costs = []
 
 # 定义优化器
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-# 变量初始化
+# 变量初始化，btw，所有的get_variable获得的参数都是放在global_variable池中的
 init = tf.global_variables_initializer()     
 
 # 开启新会话，并且初始化
@@ -180,7 +180,7 @@ for epoch in range(num_epochs):
     
     # 第二层循环，在minibatches列表内部循环
     for minibatch in minibatches:
-        # ？？？
+        # 每个minibatch都是元组，这种赋值方法类似于minibatch[0],minibatch[1]
         (minibatchX, minibatchY) = minibatch
         # 不需要返回的值，可以赋值给空格；sess.run的参数，第一项是要fetch的值，第二项是feed_dict；计算上面定义的cost
         _, mini_batch_cost, __ = sess.run([optimizer, cost, extra_update_ops], feed_dict={X: minibatchX, Y: minibatchY, is_training:True})
@@ -211,7 +211,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
 # eval()也是启动计算的一种方式。基于Tensorflow的基本原理，首先需要定义图，然后计算图，其中计算图的函数常见的有run()函数，如sess.run()。同样eval()也是此类函数，是sess.run()的另外一种写法。
 # 计算训练集误差
-# ？？？is_training标记为False的时候不会执行dropout等操作。注意is_training是放在feed_dict里面的
+# is_training标记为False的时候不会执行dropout等操作。只有在优化参数的时候is_training = True. 注意is_training是放在feed_dict里面的。
 train_accuracy = accuracy.eval(session=sess, feed_dict={X: trainX, Y: trainY, is_training:False})    
 # 计算验证集误差
 dev_accuracy = accuracy.eval(session=sess, feed_dict={X: devX, Y: devY, is_training:False})
@@ -223,4 +223,5 @@ print("dev_accuracy = " + str(dev_accuracy))
 testY_pred = predict_op.eval(session=sess, feed_dict={X: testX, is_training:False})
 # 保存成一个一列dataframe，列标签是Label
 testYDf = pd.DataFrame(testY_pred.reshape(-1, 1), index=np.arange(1, 1 + len(testY_pred)), columns=["Label"]) # index 要求从 1 开始
+# 保存成csv
 testYDf.to_csv("test_predict.csv", index=True, index_label="ImageId")
