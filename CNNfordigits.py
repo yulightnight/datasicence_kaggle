@@ -5,7 +5,6 @@ from tensorflow.contrib import rnn
 import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 import time
-%matplotlib inline
 
 import os
 print(os.listdir("../input"))
