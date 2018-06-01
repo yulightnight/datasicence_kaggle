@@ -56,6 +56,7 @@ print("验证集Y的形状是{} ".format(devY.shape))
 print("测试集X的形状是{} ".format(testX.shape))
 
 #画出一张图片，先选我们要花的第index张图片
+plt.figure()
 index = 102
 #调用imshow的API，画出第index个样本的所有行，所有列，和第一个channel，cmap参数定义的是图片颜色，3channel图片无法定义cmap， interpolation可以定义缺失值插值方法（此处未用到）
 plt.imshow(trainX[index, :, :, 0], cmap ='gray')
