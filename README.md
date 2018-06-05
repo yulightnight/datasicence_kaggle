@@ -10,5 +10,5 @@ The data set come from a kaggle get-started competition. which is the same with 
 A very good material to practice deep learning & tensorflow manipulation.
 
 Hope you enjoy!
-contact me if any error occur.
+contact me if any error occurs.
 
